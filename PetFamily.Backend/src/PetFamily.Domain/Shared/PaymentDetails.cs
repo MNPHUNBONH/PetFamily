@@ -1,4 +1,3 @@
-using CSharpFunctionalExtensions;
 
 namespace PetFamily.Domain.Shared;
 
@@ -17,9 +16,9 @@ public record PaymentDetails
     public Result<PaymentDetails> Create(string name, string description)
     {
         if (string.IsNullOrWhiteSpace(name))
-            return Result.Failure<PaymentDetails>("Name is not null or empty");
+            return "Name is not null or empty";
         if (string.IsNullOrWhiteSpace(description))
-            return Result.Failure<PaymentDetails>("Description is not null or empty");
+            return "Description is not null or empty";
 
         return new PaymentDetails(name, description);
     }

@@ -1,19 +1,26 @@
-using CSharpFunctionalExtensions;
+using System.Text.RegularExpressions;
 
 namespace PetFamily.Domain.Shared;
 
 public record PhoneNumber
 {
-    private PhoneNumber( string number)
+    public const int MAX_LENGTH = 15;
+    private const string _phoneRegex = @"^\+?\d{1,3}[-\s]?\(?\d{1,4}\)?[-\s]?\d{1,4}[-\s]?\d{1,9}$";
+
+    private PhoneNumber(string value)
     {
-        Value = number;
+        Value = value;
     }
+
     public string Value { get; }
-    
-    public Result<PhoneNumber> Create(string number)
+
+    public static Result<PhoneNumber> Create(string number)
     {
         if (string.IsNullOrWhiteSpace(number))
-            return Result.Failure<PhoneNumber>("Phone number is not null or empty");
+            return "Phone number is not null or empty";
+
+        if (Regex.IsMatch(number, _phoneRegex) == false)
+            return "Phone number is not in valid format";
 
         return new PhoneNumber(number);
     }

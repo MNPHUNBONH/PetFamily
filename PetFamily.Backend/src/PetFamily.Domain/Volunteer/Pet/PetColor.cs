@@ -2,10 +2,10 @@ namespace PetFamily.Domain.Volunteer.Pet;
 
 public record PetColor
 {
-    public string Color { get;}
+    public string Value { get;}
     
-    public PetColor(string color)
+    public PetColor(string value)
     {
-        Color = color;
+        Value = value;
     }
 }

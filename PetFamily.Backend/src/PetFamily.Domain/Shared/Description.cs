@@ -1,20 +1,20 @@
-using CSharpFunctionalExtensions;
+
 
 namespace PetFamily.Domain.Shared;
 
 public record Description
 {
-    private Description(string description)
-    {
-        Value = description;
-    }
+    public const int MAX_LENGTH = 2000;
     public string Value { get; }
-
-    public Result<Description> Create(string description)
+    private Description(string value)
     {
-        if (string.IsNullOrWhiteSpace(description))
-            return Result.Failure<Description>("Description is not null or empty");
+        Value = value;
+    }
+    public Result<Description> Create(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return "Description is not null or empty";
 
-        return new Description(description);
+        return new Description(value);
     }
 }

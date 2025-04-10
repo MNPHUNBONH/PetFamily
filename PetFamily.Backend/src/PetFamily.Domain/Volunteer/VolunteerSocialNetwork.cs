@@ -1,4 +1,6 @@
-using CSharpFunctionalExtensions;
+
+
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Volunteer;
 
@@ -16,9 +18,9 @@ public record VolunteerSocialNetwork
     public Result<VolunteerSocialNetwork> Create(string name, string link)
     {
         if (string.IsNullOrWhiteSpace(name))
-             return Result.Failure<VolunteerSocialNetwork>("Name is not null or empty");
+             return "Name is not null or empty";
         if (string.IsNullOrWhiteSpace(link))
-            return Result.Failure<VolunteerSocialNetwork>("Link is not null or empty");
+            return "Link is not null or empty";
         
         return new VolunteerSocialNetwork(name, link);
     }
