@@ -4,11 +4,11 @@ using PetFamily.Domain.Species;
 namespace PetFamily.Domain.Volunteer.Pet;
 public class Pet : Shared.Entity<PetId>
 {
+    
     private Pet(PetId id) : base(id)
      {
      } 
-    public PetId Id { get; private set; } 
-    public Name Name { get; private set; }
+    public Title Title { get; private set; }
     public SpeciesId SpeciesId { get; private set; }
     public Description Description { get; private set; }
     public PetGender PetGender { get; private set; }
@@ -29,7 +29,7 @@ public class Pet : Shared.Entity<PetId>
     
     private Pet(
         PetId id, 
-        Name name,
+        Title title,
         SpeciesId speciesId, 
         Description description,
         PetGender gender,
@@ -45,8 +45,7 @@ public class Pet : Shared.Entity<PetId>
         bool isNeutered = false,
         bool isVaccinated = false) : base(id)
     {
-        Id = id;
-        Name = name;
+        Title = title;
         SpeciesId = speciesId;
         Description = description;
         PetGender = gender;

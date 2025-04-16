@@ -1,40 +1,36 @@
-using CSharpFunctionalExtensions;
 using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Volunteer;
 
-public class Volunteer : Shared.Entity<VolunteerId>
-{ 
+public class Volunteer : Entity<VolunteerId>
+{
     private readonly List<Pet.Pet> _pets = [];
     private readonly List<VolunteerSocialNetwork> _socialNetworks = [];
     private readonly List<PaymentDetails> _paymentDetails = [];
-    
+
+    //EF Core
     private Volunteer(VolunteerId id) : base(id)
     {
     }
-    public VolunteerId VolunteerId { get; private set; }
     public VolunteerFullName FullName { get; private set; }
-    public VolunteerEmail Email { get; private set; }  
-    public Description GeneralDescription { get; private set; }
-    public int Experience { get; private set; } = default!;
+    public VolunteerEmail Email { get; private set; }
+    public Description Description { get; private set; }
+    public VolunteerExperience Experience { get; private set; }
     public PhoneNumber Phone { get; private set; } = default!;
-    
-    public IReadOnlyList<PaymentDetails> PaymentDetails => _paymentDetails;
-    public IReadOnlyList<VolunteerSocialNetwork> SocialNetworks => _socialNetworks;
+    public VolunteerDetails VolunteerDetails;
     public IReadOnlyList<Pet.Pet> Pets => _pets;
 
 
-    private Volunteer(VolunteerId id, 
+    private Volunteer(VolunteerId volunteerId,
         VolunteerFullName name,
-        VolunteerEmail email, 
-        Description description, 
-        PhoneNumber phoneNumber, 
-        int experience = 0) : base(id)
+        VolunteerEmail email,
+        Description description,
+        PhoneNumber phoneNumber,
+        VolunteerExperience experience) : base(volunteerId)
     {
-        VolunteerId = id;
         FullName = name;
         Email = email;
-        GeneralDescription = description;
+        Description = description;
         Phone = phoneNumber;
         Experience = experience;
     }
@@ -54,6 +50,4 @@ public class Volunteer : Shared.Entity<VolunteerId>
         var foundHome = _pets.Where(p => p.HelpStatus.Value == "Нуждается в помощи").ToList().AsReadOnly();
         return foundHome;
     }
-    
-    
 }

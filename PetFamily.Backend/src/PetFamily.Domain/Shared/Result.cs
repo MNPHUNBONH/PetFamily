@@ -1,0 +1,42 @@
+namespace PetFamily.Domain.Shared;
+
+public class Result
+{
+    public Result(bool isSuccess, string? error)
+    {
+        if(isSuccess && error is not null)
+            throw new InvalidOperationException();
+
+        if (isSuccess == false && error == null)
+            throw new InvalidOperationException();
+        
+        IsSuccess = isSuccess;
+        Error = error;
+       
+    }
+    public string? Error { get; set; }
+    public bool IsSuccess { get; set; }
+    public bool IsFailure => !IsSuccess;
+    
+    public static Result Success() => new Result(true, null);
+    public static Result Failure(string error) => new Result(false, error); 
+    public static implicit operator Result(string error) => new(false, error);
+}
+public class Result<TValue> : Result
+{
+    public Result(TValue value, bool isSuccess,string? error) 
+        : base(true, error)
+    {
+        _value = value;
+    }
+    private readonly TValue _value;
+    
+    public TValue Value => IsSuccess ? _value : throw new InvalidOperationException("The value of a failur result can not be accessed.");
+    
+    public static Result<TValue> Success(TValue value) => new(value, true, null);
+    
+    public static Result<TValue> Failure(string error) => new(default!, false, error);
+    
+    public static implicit operator Result<TValue>(TValue value) => new(value, default!, null);
+    public static implicit operator Result<TValue>(string error) => new(default!, false, error);
+}

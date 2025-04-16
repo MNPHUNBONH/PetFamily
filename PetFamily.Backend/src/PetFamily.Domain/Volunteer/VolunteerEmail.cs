@@ -1,20 +1,22 @@
-using CSharpFunctionalExtensions;
+
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Volunteer;
 
 public record VolunteerEmail
 {
-    public string Email { get; }
+    public const int MAX_LENGTH = 100;
+    public string Value { get; }
 
-    private VolunteerEmail(string email)
+    private VolunteerEmail(string value)
     {
-        Email = email;
+        Value = value;
     }
     
     public static Result<VolunteerEmail> Create(string email)
     {
         if (string.IsNullOrWhiteSpace(email)) 
-            return Result.Failure<VolunteerEmail>("Email is not null or empty");
+            return "Email is not null or empty";
         
         return new VolunteerEmail(email);
     }
