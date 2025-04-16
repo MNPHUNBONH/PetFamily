@@ -22,7 +22,6 @@ public class Result
     public static Result Failure(string error) => new Result(false, error); 
     public static implicit operator Result(string error) => new(false, error);
 }
-
 public class Result<TValue> : Result
 {
     public Result(TValue value, bool isSuccess,string? error) 
