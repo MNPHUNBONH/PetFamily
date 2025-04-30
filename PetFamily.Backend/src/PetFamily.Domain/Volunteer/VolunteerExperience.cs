@@ -1,4 +1,5 @@
 
+using CSharpFunctionalExtensions;
 using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Volunteer;
@@ -11,10 +12,10 @@ public record VolunteerExperience
        Value = value;
     }
 
-    public static Result<VolunteerExperience> Create(int experiens)
+    public static Result<VolunteerExperience,Error> Create(int experiens)
     {
         if (experiens < 0 || experiens > 100) 
-            return "Experiens must be between 0 and 100";
+            return Errors.General.ValueIsInvalid("VolunteerExperience");
         
         return new VolunteerExperience(experiens);
     }

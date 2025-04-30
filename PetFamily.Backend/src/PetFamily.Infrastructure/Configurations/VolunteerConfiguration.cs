@@ -14,7 +14,8 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
         builder.HasKey(x => x.Id);
 
         builder.Property(m => m.Id)
-            .HasConversion(id => id.Value,
+            .HasConversion(
+                id => id.Value,
                 value => VolunteerId.Create(value));
 
         builder.ComplexProperty(fn => fn.FullName, n =>
@@ -27,15 +28,11 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
                 .IsRequired()
                 .HasMaxLength(VolunteerFullName.MAX_LENGTH)
                 .HasColumnName("last_name");
-            n.Property(mn => mn.MiddleName)
-                .IsRequired()
-                .HasMaxLength(VolunteerFullName.MAX_LENGTH)
-                .HasColumnName("middle_name");
         });
 
-        builder.ComplexProperty(b => b.Email, e =>
+        builder.ComplexProperty(b => b.Email, eb =>
         {
-            e.Property(e => e.Value)
+            eb.Property(e => e.Value)
                 .IsRequired()
                 .HasMaxLength(VolunteerEmail.MAX_LENGTH)
                 .HasColumnName("email");
@@ -49,9 +46,9 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
                 .HasColumnName("description");
         });
         
-        builder.ComplexProperty(b => b.Experience, e =>
+        builder.ComplexProperty(b => b.Experience, eb =>
         {
-            e.Property(e => e.Value)
+            eb.Property(e => e.Value)
                 .IsRequired()
                 .HasColumnName("experience");
         });
@@ -69,26 +66,39 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
             .HasForeignKey("volunteer_id")
             .OnDelete(DeleteBehavior.Cascade);
         
-        builder.OwnsOne(v => v.VolunteerDetails, vd =>
+        builder.OwnsOne(v => v.TransferSocialNetworkList, tb =>
         {
-            vd.ToJson();
-            vd.OwnsMany(pd => pd.PaymentDetails, b =>
+            tb.ToJson("transfer_social_network_list");
+                
+            tb.OwnsMany(t => t.SocialNetworks, sb =>
             {
-                b.Property(p => p.Name)
+                sb.Property(s => s.Name)
                     .IsRequired()
-                    .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH);
-                b.Property(p => p.Description)
+                    .HasMaxLength(VolunteerSocialNetwork.MAX_NAME_LENGTH)
+                    .HasColumnName("network_name");
+                        
+                sb.Property(s => s.Link)
                     .IsRequired()
-                    .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH);
+                    .HasMaxLength(VolunteerSocialNetwork.MAX_LINK_LENGTH)
+                    .HasColumnName("network_address");
             });
-            vd.OwnsMany(snb => snb.SocialNetworks, sn =>
+        });
+        
+        builder.OwnsOne(v => v.TransferPaymentDetailsList, tb =>
+        {
+            tb.ToJson("transfer_payment_details");
+                
+            tb.OwnsMany(t => t.RequisitesForPaymentDetails, rb =>
             {
-                sn.Property(p => p.Name)
+                rb.Property(r => r.Name)
                     .IsRequired()
-                    .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH);
-                sn.Property(p => p.Link)
+                    .HasMaxLength(VolunteerPaymentDetails.MAX_NAME_LENGTH)
+                    .HasColumnName("name_payment_details");
+                        
+                rb.Property(r => r.Description)
                     .IsRequired()
-                    .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH);
+                    .HasMaxLength(VolunteerPaymentDetails.MAX_DESCRIPTION_LENGTH)
+                    .HasColumnName("description_spayment_details");
             });
         });
     }

@@ -1,4 +1,5 @@
 
+using CSharpFunctionalExtensions;
 using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Volunteer.Pet;
@@ -12,16 +13,16 @@ public record PetHelpStatus
     {
         Value = value;
     }
-    public static Result<PetHelpStatus> Create(string input)
+    public static Result<PetHelpStatus, Error> Create(string input)
     {
         if (string.IsNullOrWhiteSpace(input))
-            return "PetHelpStatus cannot be empty.";
+            return Errors.General.ValueIsInvalid("PetHelpStatus");
 
         var status = input.Trim().ToLower();
 
         var existingStatus = _allStatus.FirstOrDefault(g => g.ToLower() == status);
         if (existingStatus == null)
-            return "PetHelpStatus is not valid.";
+            return Errors.General.ValueIsInvalid("PetHelpStatus");
 
         return new PetHelpStatus(input);
     }

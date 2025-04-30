@@ -1,5 +1,6 @@
 
 
+using CSharpFunctionalExtensions;
 using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Volunteer.Pet;
@@ -15,12 +16,10 @@ public record PetAge
         Months = months;
     }
 
-    public static Result<PetAge> Create(int year, int months)
+    public static Result<PetAge,Error> Create(int year, int months)
     {
-        if (year < 0 || year > 9999) 
-            return "Year must be between 1 and 9999";
-        if (months < 0 || months > 12)
-            return "Months must be between 0 and 12";
+        if (year < 0 || year > 9999 || months < 0 || months > 12)
+            return Errors.General.ValueIsInvalid("PetAge");
         
         return new PetAge(year, months);
     }
