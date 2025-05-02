@@ -15,7 +15,8 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
         builder.HasKey(x => x.Id);
 
         builder.Property(m => m.Id)
-            .HasConversion(id => id.Value,
+            .HasConversion(
+                id => id.Value,
                 value => PetId.Create(value));
         
         builder.ComplexProperty(p => p.Title,np =>
@@ -136,16 +137,16 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
                 .IsRequired();
         });
 
-        builder.ComplexProperty(p => p.PaymentDetails, pd =>
+        builder.ComplexProperty(p => p.VolunteerPaymentDetails, pd =>
         {
             pd.Property(d => d.Name)
                 .IsRequired()
-                .HasColumnName("name_paymentdetail")
+                .HasColumnName("name_payment_detail")
                 .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH);
             
             pd.Property(d => d.Description)
                 .IsRequired()
-                .HasColumnName("description_paymentdetail")
+                .HasColumnName("description_payment_detail")
                 .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH);
         });
         

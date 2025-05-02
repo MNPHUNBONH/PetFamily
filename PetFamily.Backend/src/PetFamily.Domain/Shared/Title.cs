@@ -1,4 +1,6 @@
 
+using CSharpFunctionalExtensions;
+
 namespace PetFamily.Domain.Shared;
 
 public record Title
@@ -9,10 +11,13 @@ public record Title
         Value = value;
     }
     public string Value { get; }
-    public Result<Title> Create(string name)
+    public Result<Title,Error> Create(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            return "Name is not null or empty";
+            return Errors.General.ValueIsInvalid("Title");
+        
+        if (name.Length > MAX_LENGTH)
+            return Errors.General.ValueIsRequired("Title");
 
         return new Title(name);
     }

@@ -1,4 +1,5 @@
 
+using CSharpFunctionalExtensions;
 using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Species;
@@ -13,5 +14,10 @@ public class Species : Shared.Entity<SpeciesId>
     {
         Title = title;
     }
-    public IReadOnlyList<Breed> Breeds => _breeds; 
+    public IReadOnlyList<Breed> Breeds => _breeds;
+
+    public static Result<Species, Error> Create(SpeciesId id, Title title)
+    {
+        return new Species(id, title);
+    }
 }

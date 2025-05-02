@@ -1,4 +1,5 @@
 
+using CSharpFunctionalExtensions;
 using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Volunteer.Pet;
@@ -17,14 +18,15 @@ public record PetAddress
         HouseNumber = houseNumber;
     }
     
-    public static Result<PetAddress> Create(string city, string street, string houseNumber)
+    public static Result<PetAddress,Error> Create(string city, string street, string houseNumber)
     {
-        if (string.IsNullOrWhiteSpace(city))
-            return "City is not null or empty";
-        if (string.IsNullOrWhiteSpace(street))
-            return "Street is not null or empty";
-        if (string.IsNullOrWhiteSpace(houseNumber))
-            return "Housenumber is not null or empty";
+        if (string.IsNullOrWhiteSpace(city) || 
+            string.IsNullOrWhiteSpace(street) ||
+            string.IsNullOrWhiteSpace(houseNumber))
+            return Errors.General.ValueIsInvalid("PetAddress");
+       
+        if (city.Length > MAX_LENGTH || street.Length > MAX_LENGTH || houseNumber.Length > MAX_LENGTH)
+            return Errors.General.ValueIsRequired("PetAddress");
 
         return new PetAddress(city, street, houseNumber);
     }

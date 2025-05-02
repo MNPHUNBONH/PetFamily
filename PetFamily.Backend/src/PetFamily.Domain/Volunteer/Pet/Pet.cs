@@ -1,13 +1,15 @@
-﻿using PetFamily.Domain.Shared;
+﻿using CSharpFunctionalExtensions;
+using PetFamily.Domain.Shared;
 using PetFamily.Domain.Species;
 
 namespace PetFamily.Domain.Volunteer.Pet;
 public class Pet : Shared.Entity<PetId>
 {
-    
+    //EF Core
     private Pet(PetId id) : base(id)
      {
      } 
+    
     public Title Title { get; private set; }
     public SpeciesId SpeciesId { get; private set; }
     public Description Description { get; private set; }
@@ -22,7 +24,7 @@ public class Pet : Shared.Entity<PetId>
     public bool IsVaccinated { get; private set; }
     public PetAge PetAge { get; private set; }
     public PetHelpStatus HelpStatus { get; private set; }
-    public PaymentDetails PaymentDetails { get; private set; }
+    public VolunteerPaymentDetails VolunteerPaymentDetails { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
     
@@ -41,9 +43,9 @@ public class Pet : Shared.Entity<PetId>
         PetSize petSize,
         PetAge petAge,
         PetHelpStatus helpStatus,
-        PaymentDetails paymentDetails,
-        bool isNeutered = false,
-        bool isVaccinated = false) : base(id)
+        VolunteerPaymentDetails volunteerPaymentDetails,
+        bool isNeutered ,
+        bool isVaccinated ): base(id)
     {
         Title = title;
         SpeciesId = speciesId;
@@ -57,9 +59,45 @@ public class Pet : Shared.Entity<PetId>
         PhoneVolunteer = phoneVolunteer;
         PetAge = petAge;
         HelpStatus = helpStatus;
-        PaymentDetails = paymentDetails;
+        VolunteerPaymentDetails = volunteerPaymentDetails;
         CreatedAt = DateTime.UtcNow;
         IsNeutered = isNeutered;
         IsVaccinated = isVaccinated;
     }
-}
+
+    public static Result<Pet, Error> Create(
+        PetId id,
+        Title title,
+        SpeciesId speciesId,
+        Description description,
+        PetGender gender,
+        BreedId breedId,
+        PetAddress address,
+        PetColor color,
+        Description healthInformation,
+        PhoneNumber phoneVolunteer,
+        PetSize petSize,
+        PetAge petAge,
+        PetHelpStatus helpStatus,
+        VolunteerPaymentDetails volunteerPaymentDetail,
+        bool isNeutered = false,
+        bool isVaccinated = false)
+    {
+        return new Pet(id,
+            title,
+            speciesId,
+            description,
+            gender,
+            breedId,
+            address,
+            color,
+            healthInformation,
+            phoneVolunteer,
+            petSize,
+            petAge,
+            helpStatus,
+            volunteerPaymentDetail,
+            isNeutered,
+            isVaccinated);
+    }
+ }

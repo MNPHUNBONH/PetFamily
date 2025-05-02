@@ -1,4 +1,4 @@
-
+using CSharpFunctionalExtensions;
 
 namespace PetFamily.Domain.Shared;
 
@@ -10,11 +10,13 @@ public record Description
     {
         Value = value;
     }
-    public Result<Description> Create(string value)
+    public static Result<Description,Error> Create(string description)
     {
-        if (string.IsNullOrWhiteSpace(value))
-            return "Description is not null or empty";
+        if (string.IsNullOrWhiteSpace(description))
+            return Errors.General.ValueIsInvalid("Description");
+        if (description.Length > MAX_LENGTH)
+            return Errors.General.ValueIsRequired("Description");
 
-        return new Description(value);
+        return new Description(description);
     }
 }

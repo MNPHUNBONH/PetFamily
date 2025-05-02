@@ -1,5 +1,6 @@
 
 
+using CSharpFunctionalExtensions;
 using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Volunteer;
@@ -9,29 +10,23 @@ public record VolunteerFullName
     public const int MAX_LENGTH = 100;
     public string FirstName { get; }
     public string LastName { get; }
-    public string MiddleName { get; }
-    
-    public string FullName() => $"{FirstName} {LastName}  {MiddleName}";
+    public string FullName() => $"{FirstName} {LastName}";
 
-    private VolunteerFullName(string firstName, string lastName, string middleName)
+    private VolunteerFullName(string firstName, string lastName)
     {
         FirstName = firstName;
         LastName = lastName;
-        MiddleName = middleName;
     }
 
-    public static Result<VolunteerFullName> Create(string firstName, string lastName, string middleName)
+    public static Result<VolunteerFullName,Error> Create(string firstName, string lastName)
     {
-        if (string.IsNullOrWhiteSpace(firstName)) 
-            return "FirstName is not null or empty";
+        if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
+            return Errors.General.ValueIsInvalid("VolunteerFullName");
         
-        if (string.IsNullOrWhiteSpace(lastName)) 
-            return "LastName is not null or empty";
+        if (firstName.Length > MAX_LENGTH || lastName.Length > MAX_LENGTH)
+            return Errors.General.ValueIsRequired("VolunteerFullName");
         
-        if (string.IsNullOrWhiteSpace(middleName))
-            return "MiddleName is not null or empty";
-        
-        return new VolunteerFullName(firstName, lastName, middleName);
+        return new VolunteerFullName(firstName, lastName);
     }
     
 }
