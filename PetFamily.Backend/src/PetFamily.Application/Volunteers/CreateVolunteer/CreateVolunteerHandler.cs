@@ -1,4 +1,5 @@
 using CSharpFunctionalExtensions;
+using PetFamily.Application.Volunteers.Commands;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Volunteer;
 
@@ -13,57 +14,77 @@ public class CreateVolunteerHandler
         _volunteersRepository = volunteersRepository;
     }
 
-    public async Task<Result<Guid, Error>> Handler(CreateVolunteerRequest createVolunteerRequest,
+    public async Task<Result<Guid, Error>> Handler(CreateVolunteerCommand command,
         CancellationToken cancellationToken = default)
     {
-        //Валидация
-        // получить модуль с названием из requast и если он существует то вернуть ошибку
-
         var volunteerId = VolunteerId.NewVolunteerId();
 
         var volunteerFullName =
-            VolunteerFullName.Create(createVolunteerRequest.FirstName, createVolunteerRequest.LastName);
+            VolunteerFullName.Create(command.VolunteerFullName.FirstName,
+                command.VolunteerFullName.LastName);
         if (volunteerFullName.IsFailure)
-            return Errors.General.ValueIsInvalid();
+            return volunteerFullName.Error;
 
 
-        var volunteerDescription = Description.Create(createVolunteerRequest.Description);
+        var volunteerDescription = Description.Create(command.Description);
         if (volunteerDescription.IsFailure)
-            return Errors.General.ValueIsInvalid();
+            return volunteerDescription.Error;
 
-        var volunteerEmail = VolunteerEmail.Create(createVolunteerRequest.Email);
+        var volunteerEmail = VolunteerEmail.Create(command.Email);
         if (volunteerEmail.IsFailure)
-            return Errors.General.ValueIsInvalid();
+            return volunteerEmail.Error;
 
         var moduleExist = _volunteersRepository.GetByEmail(volunteerEmail.Value);
-        
+
         if (moduleExist.Result.IsSuccess)
             return Errors.Volunteer.AlreadyExist();
 
-        var volunteerExperience = VolunteerExperience.Create(createVolunteerRequest.Experience);
+        var volunteerExperience = VolunteerExperience.Create(command.Experience);
         if (volunteerExperience.IsFailure)
-            return Errors.General.ValueIsInvalid();
+            return volunteerExperience.Error;
 
-        var volunteerPhone = PhoneNumber.Create(createVolunteerRequest.Phone);
+        var volunteerPhone = PhoneNumber.Create(command.Phone);
         if (volunteerPhone.IsFailure)
-            return Errors.General.ValueIsInvalid();
-        
-        //тест данные для соц сетей 
-        var socNetwork1 = VolunteerSocialNetwork.Create("Vkontakte", "vkontakte@gmail.com");
-        var socNetwork2 = VolunteerSocialNetwork.Create("Twitter", "twitte/12231.com");
-        var socTransfer = TransferSocialNetworkList.Create(new List<VolunteerSocialNetwork>{socNetwork1.Value,socNetwork2.Value});
-        
-        //тест Данные для Реквизитов оплаты
-        
-        var paymentDetails1 = VolunteerPaymentDetails.Create("PayPal","Number:123456");
-        var paymentDetails2 = VolunteerPaymentDetails.Create("BelBANK","Number:6623123");
-        var payTransfer = TransferPaymentDetailsList.Create(new List<VolunteerPaymentDetails>{paymentDetails1.Value,paymentDetails2.Value});
-        //Создание домен модели
-        var volunteerResult = Volunteer.Create(volunteerId, volunteerFullName.Value,
-            volunteerEmail.Value, volunteerDescription.Value, volunteerExperience.Value, volunteerPhone.Value,payTransfer.Value,socTransfer.Value);
+            return volunteerPhone.Error;
+
+        var socialNetworkList = new List<VolunteerSocialNetwork>();
+
+        foreach (var volunteerSocialNetwork in command.SocialNetwork)
+        {
+            var socialNetwork =
+                VolunteerSocialNetwork.Create(volunteerSocialNetwork.Name, volunteerSocialNetwork.Link);
+            if (socialNetwork.IsFailure)
+                return socialNetwork.Error;
+            socialNetworkList.Add(socialNetwork.Value);
+        }
+
+        var socTransfer = TransferSocialNetworkList.Create(socialNetworkList);
+
+        var paymenDetailsList = new List<VolunteerPaymentDetails>();
+        foreach (var volunteerPaymentDetails in command.PaymentDetails)
+        {
+            var paymentDetails =
+                VolunteerPaymentDetails.Create(volunteerPaymentDetails.Name,
+                    volunteerPaymentDetails.Description);
+            if (paymentDetails.IsFailure)
+                return paymentDetails.Error;
+            paymenDetailsList.Add(paymentDetails.Value);
+        }
+
+        var payTransfer = TransferPaymentDetailsList.Create(paymenDetailsList);
+
+        var volunteerResult = Volunteer.Create(
+            volunteerId,
+            volunteerFullName.Value,
+            volunteerEmail.Value,
+            volunteerDescription.Value,
+            volunteerExperience.Value, 
+            volunteerPhone.Value,
+            payTransfer.Value, 
+            socTransfer.Value);
 
         if (volunteerResult.IsFailure)
-            return Errors.General.ValueIsInvalid();
+            return volunteerResult.Error;
 
         //Сохранине в бд
         await _volunteersRepository.Add(volunteerResult.Value, cancellationToken);
