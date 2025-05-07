@@ -31,7 +31,7 @@ public class VolunteersRepository : IVolunteersRepository
             .Include(s=>s.TransferSocialNetworkList)
             .FirstOrDefaultAsync(v => v.Id == volunteerId, cancellationToken);
 
-        if (volunteer == null)
+        if (volunteer is null)
             return Errors.General.NotFound(volunteerId);
 
         return volunteer;
