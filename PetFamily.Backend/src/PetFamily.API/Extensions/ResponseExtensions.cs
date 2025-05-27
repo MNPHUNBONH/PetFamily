@@ -1,5 +1,6 @@
 using System.Net;
 using CSharpFunctionalExtensions;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using PetFamily.API.Response;
 using PetFamily.Domain.Shared;
@@ -8,43 +9,47 @@ namespace PetFamily.API.Extensions;
 
 public static class ResponseExtensions
 {
-    public static ActionResult ToResponse (this UnitResult<Error> result)
+    public static ActionResult ToResponse(this Error error)
     {
-        if (result.IsSuccess)
-            return new OkResult();
-    
-        var statusCode = result.Error.Type switch
-        {
-            ErrorType.Validation => StatusCodes.Status400BadRequest,
-            ErrorType.NotFound => StatusCodes.Status404NotFound,
-            ErrorType.Conflict => StatusCodes.Status409Conflict,
-            ErrorType.Failure => StatusCodes.Status500InternalServerError,
-            _ => StatusCodes.Status500InternalServerError
-        };
-    
-        var envelope = Envelope.Error(result.Error);
-    
-        return new ObjectResult(envelope)
-            { StatusCode = statusCode };
-    } 
-    
-    public static ActionResult<T> ToResponse<T>(this Result<T, Error> result)
-    {
-        if (result.IsSuccess)
-            return new OkObjectResult(Envelope.Ok(result.Value));
-    
-        var statusCode = result.Error.Type switch
-        {
-            ErrorType.Validation => StatusCodes.Status400BadRequest,
-            ErrorType.NotFound => StatusCodes.Status404NotFound,
-            ErrorType.Conflict => StatusCodes.Status409Conflict,
-            ErrorType.Failure => StatusCodes.Status500InternalServerError,
-            _ => StatusCodes.Status500InternalServerError
-        };
-    
-        var envelope = Envelope.Error(result.Error);
-    
+        var statusCode = GetStatusCodeForErrorType(error.Type);
+        
+        var envelope = Envelope.Error(error.ToErrorList());
+
         return new ObjectResult(envelope)
             { StatusCode = statusCode };
     }
+
+    public static ActionResult ToResponse(this ErrorList errors)
+    {
+        if (!errors.Any())
+             return new ObjectResult(null)
+            {
+                StatusCode = StatusCodes.Status500InternalServerError,
+            };
+
+
+        var distinctErrorType = errors
+            .Select(x => x.Type)
+            .Distinct()
+            .ToList();
+
+        var statusCode = distinctErrorType.Count() > 1
+            ? StatusCodes.Status500InternalServerError
+            : GetStatusCodeForErrorType(distinctErrorType.First());
+        
+        var envelope = Envelope.Error(errors);
+
+        return new ObjectResult(envelope)
+            { StatusCode = statusCode };
+    }
+
+    private static int GetStatusCodeForErrorType(ErrorType errorType) =>
+        errorType switch
+        {
+            ErrorType.Validation => StatusCodes.Status400BadRequest,
+            ErrorType.NotFound => StatusCodes.Status404NotFound,
+            ErrorType.Conflict => StatusCodes.Status409Conflict,
+            ErrorType.Failure => StatusCodes.Status500InternalServerError,
+            _ => StatusCodes.Status500InternalServerError
+        };
 }

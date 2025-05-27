@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using PetFamily.Domain.Aggregates.Species;
 using PetFamily.Domain.Shared;
-using PetFamily.Domain.Species;
-using PetFamily.Domain.Volunteer.Pet;
+using PetFamily.Domain.Shared.ValueObject;
 
 namespace PetFamily.Infrastructure.Configurations;
 
@@ -22,7 +22,7 @@ public class BreedConfiguration : IEntityTypeConfiguration<Breed>
         {
             bt.Property(n => n.Value)
                 .HasMaxLength(Title.MAX_LENGTH)
-                .HasColumnName("name")
+                .HasColumnName("nameVo")
                 .IsRequired();
         });
     }

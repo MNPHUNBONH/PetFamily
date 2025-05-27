@@ -1,6 +1,7 @@
-using PetFamily.Application.Volunteers.CreateVolunteer;
+ using PetFamily.Application.Volunteers.CreateVolunteer;
+ using PetFamily.Application.Volunteers.DTOs;
 
-namespace PetFamily.Application.Volunteers.Commands;
+ namespace PetFamily.Application.Volunteers.Commands;
 
 public record CreateVolunteerCommand(
     VolunteerFullNameDto VolunteerFullName,
@@ -8,5 +9,5 @@ public record CreateVolunteerCommand(
     string Description,
     int Experience,
     string Phone,
-    IEnumerable<VolunteerSocialNetworkDto> SocialNetwork,
+    IEnumerable<VolunteerSocialNetworkDto> SocialNetworks,
     IEnumerable<VolunteerPaymentDetailsDto> PaymentDetails);
