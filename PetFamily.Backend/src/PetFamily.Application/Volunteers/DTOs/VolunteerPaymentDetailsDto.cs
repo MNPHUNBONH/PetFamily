@@ -1,3 +1,3 @@
-namespace PetFamily.Application.Volunteers.CreateVolunteer;
+namespace PetFamily.Application.Volunteers.DTOs;
 
 public record VolunteerPaymentDetailsDto(string Name, string Description);
